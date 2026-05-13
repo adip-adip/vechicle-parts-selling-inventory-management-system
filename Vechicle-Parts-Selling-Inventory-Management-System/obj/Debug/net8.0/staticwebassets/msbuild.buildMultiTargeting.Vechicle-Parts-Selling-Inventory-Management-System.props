@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="../build/Vechicle-Parts-Selling-Inventory-Management-System.props" />
+</Project>
