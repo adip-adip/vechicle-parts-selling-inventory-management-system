@@ -11,6 +11,9 @@ public class AppDbContext : IdentityDbContext<Users>
     {
     }
 
+    public DbSet<VehiclePart> VehicleParts { get; set; }
+    public DbSet<Sale> Sales { get; set; }
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
