@@ -57,6 +57,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddScoped<IJWTService, JWTService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IPartService, PartService>();
 builder.Services.AddScoped<RequestMiddleware>();
 
 builder.Services.AddIdentity<Users, IdentityRole>()
