@@ -58,6 +58,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<IJWTService, JWTService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IPartService, PartService>();
+builder.Services.AddScoped<ISaleService, SaleService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<RequestMiddleware>();
 
 builder.Services.AddIdentity<Users, IdentityRole>()
