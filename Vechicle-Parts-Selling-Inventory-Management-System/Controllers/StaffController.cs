@@ -16,12 +16,14 @@ public class StaffController : ControllerBase
     private readonly AppDbContext _dbContext;
     private readonly ISaleService _saleService;
     private readonly IEmailService _emailService;
+    private readonly ICustomerService _customerService;
 
-    public StaffController(AppDbContext dbContext, ISaleService saleService, IEmailService emailService)
+    public StaffController(AppDbContext dbContext, ISaleService saleService, IEmailService emailService, ICustomerService customerService)
     {
         _dbContext = dbContext;
         _saleService = saleService;
         _emailService = emailService;
+        _customerService = customerService;
     }
 
     [HttpPost("customers")]
@@ -131,5 +133,69 @@ public class StaffController : ControllerBase
         {
             return BadRequest(new { message = $"Failed to send email: {ex.Message}" });
         }
+    }
+
+    [HttpGet("customers/{id:int}")]
+    public async Task<IActionResult> GetCustomerDetails(int id)
+    {
+        var customer = await _customerService.GetCustomerByIdAsync(id);
+        if (customer == null)
+            return NotFound($"Customer with id {id} not found.");
+        return Ok(customer);
+    }
+
+    [HttpGet("customers/{id:int}/history")]
+    public async Task<IActionResult> GetCustomerHistory(int id)
+    {
+        var history = await _customerService.GetCustomerHistoryAsync(id);
+        if (history == null)
+            return NotFound($"Customer with id {id} not found.");
+        return Ok(history);
+    }
+
+    [HttpGet("customers/{id:int}/vehicles")]
+    public async Task<IActionResult> GetCustomerVehicles(int id)
+    {
+        var vehicles = await _customerService.GetCustomerVehiclesAsync(id);
+        if (vehicles.Count == 0)
+        {
+            var customerExists = await _dbContext.Customers.AnyAsync(c => c.Id == id);
+            if (!customerExists)
+                return NotFound($"Customer with id {id} not found.");
+            return Ok(new List<object>());
+        }
+        return Ok(vehicles);
+    }
+
+    [HttpGet("customers/reports/regular")]
+    public async Task<IActionResult> GetRegularCustomers([FromQuery] int count = 10)
+    {
+        var customers = await _customerService.GetRegularCustomersAsync(count);
+        return Ok(customers);
+    }
+
+    [HttpGet("customers/reports/high-spenders")]
+    public async Task<IActionResult> GetHighSpenders([FromQuery] int count = 10)
+    {
+        var customers = await _customerService.GetHighSpendersAsync(count);
+        return Ok(customers);
+    }
+
+    [HttpGet("customers/reports/pending-credits")]
+    public async Task<IActionResult> GetPendingCredits()
+    {
+        var customers = await _customerService.GetPendingCreditsAsync();
+        return Ok(customers);
+    }
+
+    [HttpGet("customers/search")]
+    public async Task<IActionResult> SearchCustomers(
+        [FromQuery] string? term = null,
+        [FromQuery] int? customerId = null,
+        [FromQuery] string? phone = null,
+        [FromQuery] string? vehicleNo = null)
+    {
+        var results = await _customerService.SearchCustomersAsync(term, customerId, phone, vehicleNo);
+        return Ok(results);
     }
 }

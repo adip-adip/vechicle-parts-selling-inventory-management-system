@@ -60,6 +60,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IPartService, PartService>();
 builder.Services.AddScoped<ISaleService, SaleService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<RequestMiddleware>();
 
 builder.Services.AddIdentity<Users, IdentityRole>()

@@ -27,4 +27,5 @@ public class Customer
     public Users? User { get; set; }
 
     public ICollection<Vehicle> Vehicles { get; set; } = new List<Vehicle>();
+    public ICollection<Sale> Sales { get; set; } = new List<Sale>();
 }

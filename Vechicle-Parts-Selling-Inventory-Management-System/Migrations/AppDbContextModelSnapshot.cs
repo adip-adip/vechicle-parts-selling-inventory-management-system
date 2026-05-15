@@ -50,22 +50,22 @@ namespace Vechicle_Parts_Selling_Inventory_Management_System.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "70e8313c-991e-4077-9cee-ea259eb1803c",
-                            ConcurrencyStamp = "bc0543da-62db-44f8-a758-1a569bf4d90d",
+                            Id = "d4b9764c-90c7-49c0-96af-76c4dbb7f858",
+                            ConcurrencyStamp = "38273cc1-a160-4e7f-8e26-6011a447dfae",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "7bcb74dd-1ceb-4e30-9753-1bcf2c58c829",
-                            ConcurrencyStamp = "58138f76-6893-4be1-96e3-03ccb143e76b",
+                            Id = "b1e85651-71b9-4ea0-a6d9-227082d75571",
+                            ConcurrencyStamp = "1d744f5c-66b1-440e-85fd-2c34773c2be7",
                             Name = "Staff",
                             NormalizedName = "STAFF"
                         },
                         new
                         {
-                            Id = "a6770f2e-8330-4c52-8351-6d21f86699c7",
-                            ConcurrencyStamp = "82383230-d109-47df-9f0d-030612a71ba8",
+                            Id = "aeadc544-c080-4c3d-86d7-7dd92b53e1a9",
+                            ConcurrencyStamp = "7b58584d-148b-47d3-86e2-2702f9d6153e",
                             Name = "Customer",
                             NormalizedName = "CUSTOMER"
                         });

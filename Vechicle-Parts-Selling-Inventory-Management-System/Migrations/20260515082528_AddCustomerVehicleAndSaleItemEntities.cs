@@ -13,37 +13,24 @@ namespace Vechicle_Parts_Selling_Inventory_Management_System.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DeleteData(
-                table: "Roles",
-                keyColumn: "Id",
-                keyValue: "54d14d33-8711-473b-b0b5-154262163af8");
+            migrationBuilder.Sql("DROP TABLE IF EXISTS \"Sales\"");
 
-            migrationBuilder.DeleteData(
-                table: "Roles",
-                keyColumn: "Id",
-                keyValue: "6fc02d04-a5ac-4d57-b7d6-af4ee2748887");
-
-            migrationBuilder.DeleteData(
-                table: "Roles",
-                keyColumn: "Id",
-                keyValue: "7334bb87-c06a-4c4f-8358-40d13fa293de");
-
-            migrationBuilder.AlterColumn<int>(
-                name: "CustomerId",
-                table: "Sales",
-                type: "integer",
-                nullable: false,
-                defaultValue: 0,
-                oldClrType: typeof(string),
-                oldType: "text",
-                oldNullable: true);
-
-            migrationBuilder.AddColumn<string>(
-                name: "InvoiceNumber",
-                table: "Sales",
-                type: "character varying(50)",
-                maxLength: 50,
-                nullable: true);
+            migrationBuilder.CreateTable(
+                name: "Sales",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    InvoiceNumber = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
+                    TotalAmount = table.Column<decimal>(type: "numeric", nullable: false),
+                    SaleDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    CustomerId = table.Column<int>(type: "integer", nullable: false),
+                    PaymentStatus = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Sales", x => x.Id);
+                });
 
             migrationBuilder.CreateTable(
                 name: "Customers",
@@ -121,16 +108,6 @@ namespace Vechicle_Parts_Selling_Inventory_Management_System.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.InsertData(
-                table: "Roles",
-                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[,]
-                {
-                    { "70e8313c-991e-4077-9cee-ea259eb1803c", "bc0543da-62db-44f8-a758-1a569bf4d90d", "Admin", "ADMIN" },
-                    { "7bcb74dd-1ceb-4e30-9753-1bcf2c58c829", "58138f76-6893-4be1-96e3-03ccb143e76b", "Staff", "STAFF" },
-                    { "a6770f2e-8330-4c52-8351-6d21f86699c7", "82383230-d109-47df-9f0d-030612a71ba8", "Customer", "CUSTOMER" }
-                });
-
             migrationBuilder.CreateIndex(
                 name: "IX_Sales_CustomerId",
                 table: "Sales",
@@ -181,46 +158,8 @@ namespace Vechicle_Parts_Selling_Inventory_Management_System.Migrations
             migrationBuilder.DropTable(
                 name: "Customers");
 
-            migrationBuilder.DropIndex(
-                name: "IX_Sales_CustomerId",
-                table: "Sales");
-
-            migrationBuilder.DeleteData(
-                table: "Roles",
-                keyColumn: "Id",
-                keyValue: "70e8313c-991e-4077-9cee-ea259eb1803c");
-
-            migrationBuilder.DeleteData(
-                table: "Roles",
-                keyColumn: "Id",
-                keyValue: "7bcb74dd-1ceb-4e30-9753-1bcf2c58c829");
-
-            migrationBuilder.DeleteData(
-                table: "Roles",
-                keyColumn: "Id",
-                keyValue: "a6770f2e-8330-4c52-8351-6d21f86699c7");
-
-            migrationBuilder.DropColumn(
-                name: "InvoiceNumber",
-                table: "Sales");
-
-            migrationBuilder.AlterColumn<string>(
-                name: "CustomerId",
-                table: "Sales",
-                type: "text",
-                nullable: true,
-                oldClrType: typeof(int),
-                oldType: "integer");
-
-            migrationBuilder.InsertData(
-                table: "Roles",
-                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[,]
-                {
-                    { "54d14d33-8711-473b-b0b5-154262163af8", "5abc6d83-8bd9-478e-afed-8d1e795a1695", "Admin", "ADMIN" },
-                    { "6fc02d04-a5ac-4d57-b7d6-af4ee2748887", "beaf7e40-9708-4802-9908-be1b524da7f1", "Staff", "STAFF" },
-                    { "7334bb87-c06a-4c4f-8358-40d13fa293de", "86a82914-13cb-464c-9372-cb8b10ebf77d", "Customer", "CUSTOMER" }
-                });
+            migrationBuilder.DropTable(
+                name: "Sales");
         }
     }
 }
