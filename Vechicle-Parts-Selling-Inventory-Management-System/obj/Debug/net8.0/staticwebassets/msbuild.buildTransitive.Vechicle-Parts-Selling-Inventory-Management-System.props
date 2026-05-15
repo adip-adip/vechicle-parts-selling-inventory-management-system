@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="../buildMultiTargeting/Vechicle-Parts-Selling-Inventory-Management-System.props" />
-</Project>

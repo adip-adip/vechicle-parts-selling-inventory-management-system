@@ -13,6 +13,9 @@ public class AppDbContext : IdentityDbContext<Users>
 
     public DbSet<VehiclePart> VehicleParts { get; set; }
     public DbSet<Sale> Sales { get; set; }
+    public DbSet<SaleItem> SaleItems { get; set; }
+    public DbSet<Customer> Customers { get; set; }
+    public DbSet<Vehicle> Vehicles { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

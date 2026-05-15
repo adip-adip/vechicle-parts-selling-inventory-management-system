@@ -50,22 +50,22 @@ namespace Vechicle_Parts_Selling_Inventory_Management_System.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "54d14d33-8711-473b-b0b5-154262163af8",
-                            ConcurrencyStamp = "5abc6d83-8bd9-478e-afed-8d1e795a1695",
+                            Id = "70e8313c-991e-4077-9cee-ea259eb1803c",
+                            ConcurrencyStamp = "bc0543da-62db-44f8-a758-1a569bf4d90d",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "6fc02d04-a5ac-4d57-b7d6-af4ee2748887",
-                            ConcurrencyStamp = "beaf7e40-9708-4802-9908-be1b524da7f1",
+                            Id = "7bcb74dd-1ceb-4e30-9753-1bcf2c58c829",
+                            ConcurrencyStamp = "58138f76-6893-4be1-96e3-03ccb143e76b",
                             Name = "Staff",
                             NormalizedName = "STAFF"
                         },
                         new
                         {
-                            Id = "7334bb87-c06a-4c4f-8358-40d13fa293de",
-                            ConcurrencyStamp = "86a82914-13cb-464c-9372-cb8b10ebf77d",
+                            Id = "a6770f2e-8330-4c52-8351-6d21f86699c7",
+                            ConcurrencyStamp = "82383230-d109-47df-9f0d-030612a71ba8",
                             Name = "Customer",
                             NormalizedName = "CUSTOMER"
                         });
@@ -177,6 +177,48 @@ namespace Vechicle_Parts_Selling_Inventory_Management_System.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Vechicle_Parts_Selling_Inventory_Management_System.Database.Entities.Customer", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Address")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Customers");
+                });
+
             modelBuilder.Entity("Vechicle_Parts_Selling_Inventory_Management_System.Database.Entities.Sale", b =>
                 {
                     b.Property<int>("Id")
@@ -185,8 +227,12 @@ namespace Vechicle_Parts_Selling_Inventory_Management_System.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("CustomerId")
-                        .HasColumnType("text");
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("InvoiceNumber")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.Property<string>("PaymentStatus")
                         .IsRequired()
@@ -201,7 +247,41 @@ namespace Vechicle_Parts_Selling_Inventory_Management_System.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CustomerId");
+
                     b.ToTable("Sales");
+                });
+
+            modelBuilder.Entity("Vechicle_Parts_Selling_Inventory_Management_System.Database.Entities.SaleItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("SaleId")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("Subtotal")
+                        .HasColumnType("numeric");
+
+                    b.Property<decimal>("UnitPrice")
+                        .HasColumnType("numeric");
+
+                    b.Property<int>("VehiclePartId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SaleId");
+
+                    b.HasIndex("VehiclePartId");
+
+                    b.ToTable("SaleItems");
                 });
 
             modelBuilder.Entity("Vechicle_Parts_Selling_Inventory_Management_System.Database.Entities.Users", b =>
@@ -281,6 +361,46 @@ namespace Vechicle_Parts_Selling_Inventory_Management_System.Migrations
                         .HasDatabaseName("UserNameIndex");
 
                     b.ToTable("Users", (string)null);
+                });
+
+            modelBuilder.Entity("Vechicle_Parts_Selling_Inventory_Management_System.Database.Entities.Vehicle", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Make")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Model")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("RegistrationNumber")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<string>("VIN")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
+
+                    b.ToTable("Vehicles");
                 });
 
             modelBuilder.Entity("Vechicle_Parts_Selling_Inventory_Management_System.Database.Entities.VehiclePart", b =>
@@ -370,6 +490,66 @@ namespace Vechicle_Parts_Selling_Inventory_Management_System.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Vechicle_Parts_Selling_Inventory_Management_System.Database.Entities.Customer", b =>
+                {
+                    b.HasOne("Vechicle_Parts_Selling_Inventory_Management_System.Database.Entities.Users", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Vechicle_Parts_Selling_Inventory_Management_System.Database.Entities.Sale", b =>
+                {
+                    b.HasOne("Vechicle_Parts_Selling_Inventory_Management_System.Database.Entities.Customer", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+                });
+
+            modelBuilder.Entity("Vechicle_Parts_Selling_Inventory_Management_System.Database.Entities.SaleItem", b =>
+                {
+                    b.HasOne("Vechicle_Parts_Selling_Inventory_Management_System.Database.Entities.Sale", "Sale")
+                        .WithMany("SaleItems")
+                        .HasForeignKey("SaleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Vechicle_Parts_Selling_Inventory_Management_System.Database.Entities.VehiclePart", "VehiclePart")
+                        .WithMany()
+                        .HasForeignKey("VehiclePartId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Sale");
+
+                    b.Navigation("VehiclePart");
+                });
+
+            modelBuilder.Entity("Vechicle_Parts_Selling_Inventory_Management_System.Database.Entities.Vehicle", b =>
+                {
+                    b.HasOne("Vechicle_Parts_Selling_Inventory_Management_System.Database.Entities.Customer", "Customer")
+                        .WithMany("Vehicles")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+                });
+
+            modelBuilder.Entity("Vechicle_Parts_Selling_Inventory_Management_System.Database.Entities.Customer", b =>
+                {
+                    b.Navigation("Vehicles");
+                });
+
+            modelBuilder.Entity("Vechicle_Parts_Selling_Inventory_Management_System.Database.Entities.Sale", b =>
+                {
+                    b.Navigation("SaleItems");
                 });
 #pragma warning restore 612, 618
         }
