@@ -10,4 +10,5 @@ public interface IPartService
     Task<VehiclePart> CreateAsync(CreatePartDto dto);
     Task<VehiclePart?> UpdateAsync(int id, UpdatePartDto dto);
     Task<bool> DeleteAsync(int id);
+    Task<IEnumerable<VehiclePart>> GetLowStockAsync();
 }

@@ -9,10 +9,12 @@ namespace Vechicle_Parts_Selling_Inventory_Management_System.Service.Implementat
 public class PartService : IPartService
 {
     private readonly AppDbContext _dbContext;
+    private readonly IEmailService _emailService;
 
-    public PartService(AppDbContext dbContext)
+    public PartService(AppDbContext dbContext, IEmailService emailService)
     {
         _dbContext = dbContext;
+        _emailService = emailService;
     }
 
     public async Task<IEnumerable<VehiclePart>> GetAllAsync()
@@ -49,6 +51,8 @@ public class PartService : IPartService
         if (part == null)
             return null;
 
+        var previousStock = part.StockQuantity;
+
         part.Name = dto.Name;
         part.Description = dto.Description;
         part.Price = dto.Price;
@@ -57,6 +61,13 @@ public class PartService : IPartService
         part.UpdatedAt = DateTime.UtcNow;
 
         await _dbContext.SaveChangesAsync();
+
+        // Send low stock alert if stock just crossed below threshold
+        if (part.StockQuantity < 10 && previousStock >= 10)
+        {
+            _ = _emailService.SendLowStockAlertAsync(part);
+        }
+
         return part;
     }
 
@@ -69,5 +80,13 @@ public class PartService : IPartService
         _dbContext.VehicleParts.Remove(part);
         await _dbContext.SaveChangesAsync();
         return true;
+    }
+
+    public async Task<IEnumerable<VehiclePart>> GetLowStockAsync()
+    {
+        return await _dbContext.VehicleParts
+            .Where(p => p.StockQuantity < 10)
+            .OrderBy(p => p.StockQuantity)
+            .ToListAsync();
     }
 }

@@ -64,6 +64,13 @@ builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<ICustomerPortalService, CustomerPortalService>();
 builder.Services.AddScoped<RequestMiddleware>();
 
+// Feature: Vendor Management & Purchase Invoices (23050302)
+builder.Services.AddScoped<IVendorService, VendorService>();
+builder.Services.AddScoped<IPurchaseInvoiceService, PurchaseInvoiceService>();
+
+// Feature: Overdue Credit Reminders — daily background job (23050302)
+builder.Services.AddHostedService<CreditReminderBackgroundService>();
+
 builder.Services.AddIdentity<Users, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
