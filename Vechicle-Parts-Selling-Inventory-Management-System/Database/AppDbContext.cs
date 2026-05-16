@@ -20,6 +20,11 @@ public class AppDbContext : IdentityDbContext<Users>
     public DbSet<PartRequest> PartRequests { get; set; }
     public DbSet<Review> Reviews { get; set; }
 
+    // Feature: Vendor Management & Purchase Invoices (23050302)
+    public DbSet<Vendor> Vendors { get; set; }
+    public DbSet<PurchaseInvoice> PurchaseInvoices { get; set; }
+    public DbSet<PurchaseInvoiceItem> PurchaseInvoiceItems { get; set; }
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);

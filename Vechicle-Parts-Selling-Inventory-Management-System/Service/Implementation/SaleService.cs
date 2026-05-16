@@ -9,10 +9,12 @@ namespace Vechicle_Parts_Selling_Inventory_Management_System.Service.Implementat
 public class SaleService : ISaleService
 {
     private readonly AppDbContext _dbContext;
+    private readonly IEmailService _emailService;
 
-    public SaleService(AppDbContext dbContext)
+    public SaleService(AppDbContext dbContext, IEmailService emailService)
     {
         _dbContext = dbContext;
+        _emailService = emailService;
     }
 
     public async Task<Sale> CreateSaleAsync(CreateSaleDto dto)
@@ -27,6 +29,7 @@ public class SaleService : ISaleService
 
             decimal totalAmount = 0;
             var saleItems = new List<SaleItem>();
+            var lowStockParts = new List<VehiclePart>();
 
             foreach (var item in dto.Items)
             {
@@ -37,6 +40,7 @@ public class SaleService : ISaleService
                 if (part.StockQuantity < item.Quantity)
                     throw new InvalidOperationException($"Insufficient stock for '{part.Name}'. Available: {part.StockQuantity}, Requested: {item.Quantity}.");
 
+                var previousStock = part.StockQuantity;
                 var subtotal = part.Price * item.Quantity;
                 totalAmount += subtotal;
 
@@ -50,6 +54,10 @@ public class SaleService : ISaleService
 
                 part.StockQuantity -= item.Quantity;
                 part.UpdatedAt = DateTime.UtcNow;
+
+                // Track parts that just crossed below the threshold
+                if (part.StockQuantity < 10 && previousStock >= 10)
+                    lowStockParts.Add(part);
             }
 
             var sale = new Sale
@@ -65,6 +73,12 @@ public class SaleService : ISaleService
             _dbContext.Sales.Add(sale);
             await _dbContext.SaveChangesAsync();
             await transaction.CommitAsync();
+
+            // Send low stock alerts after transaction commits
+            foreach (var part in lowStockParts)
+            {
+                _ = _emailService.SendLowStockAlertAsync(part);
+            }
 
             return sale;
         }

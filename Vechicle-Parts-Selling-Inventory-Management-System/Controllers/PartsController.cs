@@ -24,6 +24,14 @@ public class PartsController : ControllerBase
         return Ok(parts);
     }
 
+    // Dashboard: returns all parts with StockQuantity < 10, ordered by quantity ascending
+    [HttpGet("low-stock")]
+    public async Task<IActionResult> GetLowStock()
+    {
+        var parts = await _partService.GetLowStockAsync();
+        return Ok(parts);
+    }
+
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetById(int id)
     {

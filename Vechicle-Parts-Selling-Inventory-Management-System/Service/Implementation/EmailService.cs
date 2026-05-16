@@ -29,13 +29,79 @@ public class EmailService : IEmailService
         if (sale == null)
             throw new InvalidOperationException($"Sale with id {saleId} not found.");
 
+        var body = BuildInvoiceBody(sale);
+
+        await SendEmailAsync(
+            to: sale.Customer!.Email,
+            subject: $"Invoice {sale.InvoiceNumber} - Vehicle Parts Inventory",
+            body: body);
+    }
+
+    public async Task SendLowStockAlertAsync(VehiclePart part)
+    {
+        // Configured in appsettings.json as Smtp:AdminEmail
+        var adminEmail = _configuration["Smtp:AdminEmail"];
+        if (string.IsNullOrWhiteSpace(adminEmail))
+            return;
+
+        var body = $@"
+<html>
+<body>
+    <h2 style=""color:red;"">⚠ Low Stock Alert</h2>
+    <p>The following part has dropped below the minimum stock threshold (10 units):</p>
+    <table style=""border-collapse:collapse;"">
+        <tr><th style=""text-align:left;padding:4px 12px;"">Field</th><th style=""text-align:left;padding:4px 12px;"">Value</th></tr>
+        <tr><td style=""padding:4px 12px;"">Part ID</td><td style=""padding:4px 12px;"">{part.Id}</td></tr>
+        <tr><td style=""padding:4px 12px;"">Part Name</td><td style=""padding:4px 12px;"">{part.Name}</td></tr>
+        <tr><td style=""padding:4px 12px;"">Category</td><td style=""padding:4px 12px;"">{part.Category ?? "N/A"}</td></tr>
+        <tr><td style=""padding:4px 12px;"">Current Stock</td><td style=""padding:4px 12px;""><strong style=""color:red;"">{part.StockQuantity}</strong></td></tr>
+    </table>
+    <p>Please reorder this part from a vendor as soon as possible.</p>
+</body>
+</html>";
+
+        await SendEmailAsync(
+            to: adminEmail,
+            subject: $"Low Stock Alert: {part.Name} ({part.StockQuantity} units remaining)",
+            body: body);
+    }
+
+    public async Task SendCreditReminderAsync(Sale sale, int daysOverdue)
+    {
+        if (sale.Customer == null)
+            return;
+
+        var body = $@"
+<html>
+<body>
+    <h2>Payment Reminder — {daysOverdue} Days Overdue</h2>
+    <p>Dear {sale.Customer.FirstName} {sale.Customer.LastName},</p>
+    <p>This is a reminder that the following invoice is overdue by <strong>{daysOverdue} days</strong>.</p>
+    <table style=""border-collapse:collapse;"">
+        <tr><th style=""text-align:left;padding:4px 12px;"">Field</th><th style=""text-align:left;padding:4px 12px;"">Value</th></tr>
+        <tr><td style=""padding:4px 12px;"">Invoice Number</td><td style=""padding:4px 12px;"">{sale.InvoiceNumber}</td></tr>
+        <tr><td style=""padding:4px 12px;"">Sale Date</td><td style=""padding:4px 12px;"">{sale.SaleDate:yyyy-MM-dd}</td></tr>
+        <tr><td style=""padding:4px 12px;"">Amount Owed</td><td style=""padding:4px 12px;""><strong>${sale.TotalAmount:F2}</strong></td></tr>
+        <tr><td style=""padding:4px 12px;"">Days Overdue</td><td style=""padding:4px 12px;""><strong style=""color:red;"">{daysOverdue}</strong></td></tr>
+    </table>
+    <p>Please settle the outstanding balance at your earliest convenience. Contact us if you have any questions.</p>
+    <p>Thank you,<br/>Vehicle Parts Inventory Team</p>
+</body>
+</html>";
+
+        await SendEmailAsync(
+            to: sale.Customer.Email,
+            subject: $"Payment Reminder ({daysOverdue} days overdue) — Invoice {sale.InvoiceNumber}",
+            body: body);
+    }
+
+    private async Task SendEmailAsync(string to, string subject, string body)
+    {
         var smtpHost = _configuration["Smtp:Host"]!;
         var smtpPort = int.Parse(_configuration["Smtp:Port"] ?? "587");
         var smtpUsername = _configuration["Smtp:Username"]!;
         var smtpPassword = _configuration["Smtp:Password"]!;
         var fromEmail = _configuration["Smtp:FromEmail"]!;
-
-        var body = BuildInvoiceBody(sale);
 
         using var client = new SmtpClient(smtpHost, smtpPort)
         {
@@ -46,11 +112,11 @@ public class EmailService : IEmailService
         var message = new MailMessage
         {
             From = new MailAddress(fromEmail),
-            Subject = $"Invoice {sale.InvoiceNumber} - Vehicle Parts Inventory",
+            Subject = subject,
             Body = body,
             IsBodyHtml = true
         };
-        message.To.Add(sale.Customer!.Email);
+        message.To.Add(to);
 
         await client.SendMailAsync(message);
     }
