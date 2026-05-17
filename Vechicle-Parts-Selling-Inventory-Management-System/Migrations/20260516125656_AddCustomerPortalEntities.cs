@@ -14,21 +14,6 @@ namespace Vechicle_Parts_Selling_Inventory_Management_System.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DeleteData(
-                table: "Roles",
-                keyColumn: "Id",
-                keyValue: "aeadc544-c080-4c3d-86d7-7dd92b53e1a9");
-
-            migrationBuilder.DeleteData(
-                table: "Roles",
-                keyColumn: "Id",
-                keyValue: "b1e85651-71b9-4ea0-a6d9-227082d75571");
-
-            migrationBuilder.DeleteData(
-                table: "Roles",
-                keyColumn: "Id",
-                keyValue: "d4b9764c-90c7-49c0-96af-76c4dbb7f858");
-
             migrationBuilder.CreateTable(
                 name: "Appointments",
                 columns: table => new
@@ -104,16 +89,6 @@ namespace Vechicle_Parts_Selling_Inventory_Management_System.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.InsertData(
-                table: "Roles",
-                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[,]
-                {
-                    { "159ea6fa-644c-42ce-ab03-d8f5722cffe2", "71efb66d-85de-446d-a3de-d4a4388e21ed", "Staff", "STAFF" },
-                    { "afbac6f8-47b2-4d27-83da-bebd425d5aef", "db0ceb6b-f6e2-4d1d-95f5-3a49a712ec46", "Admin", "ADMIN" },
-                    { "b931fc54-85c0-48ad-85ba-43b90533e48d", "7baa5671-4c1e-4e30-b1ad-8673d87a9e6e", "Customer", "CUSTOMER" }
-                });
-
             migrationBuilder.CreateIndex(
                 name: "IX_Appointments_CustomerId",
                 table: "Appointments",
@@ -146,31 +121,6 @@ namespace Vechicle_Parts_Selling_Inventory_Management_System.Migrations
 
             migrationBuilder.DropTable(
                 name: "Reviews");
-
-            migrationBuilder.DeleteData(
-                table: "Roles",
-                keyColumn: "Id",
-                keyValue: "159ea6fa-644c-42ce-ab03-d8f5722cffe2");
-
-            migrationBuilder.DeleteData(
-                table: "Roles",
-                keyColumn: "Id",
-                keyValue: "afbac6f8-47b2-4d27-83da-bebd425d5aef");
-
-            migrationBuilder.DeleteData(
-                table: "Roles",
-                keyColumn: "Id",
-                keyValue: "b931fc54-85c0-48ad-85ba-43b90533e48d");
-
-            migrationBuilder.InsertData(
-                table: "Roles",
-                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[,]
-                {
-                    { "aeadc544-c080-4c3d-86d7-7dd92b53e1a9", "7b58584d-148b-47d3-86e2-2702f9d6153e", "Customer", "CUSTOMER" },
-                    { "b1e85651-71b9-4ea0-a6d9-227082d75571", "1d744f5c-66b1-440e-85fd-2c34773c2be7", "Staff", "STAFF" },
-                    { "d4b9764c-90c7-49c0-96af-76c4dbb7f858", "38273cc1-a160-4e7f-8e26-6011a447dfae", "Admin", "ADMIN" }
-                });
         }
     }
 }

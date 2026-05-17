@@ -50,28 +50,6 @@ namespace Vechicle_Parts_Selling_Inventory_Management_System.Migrations
 
                     b.ToTable("Roles", (string)null);
 
-                    b.HasData(
-                        new
-                        {
-                            Id = "afbac6f8-47b2-4d27-83da-bebd425d5aef",
-                            ConcurrencyStamp = "db0ceb6b-f6e2-4d1d-95f5-3a49a712ec46",
-                            Name = "Admin",
-                            NormalizedName = "ADMIN"
-                        },
-                        new
-                        {
-                            Id = "159ea6fa-644c-42ce-ab03-d8f5722cffe2",
-                            ConcurrencyStamp = "71efb66d-85de-446d-a3de-d4a4388e21ed",
-                            Name = "Staff",
-                            NormalizedName = "STAFF"
-                        },
-                        new
-                        {
-                            Id = "b931fc54-85c0-48ad-85ba-43b90533e48d",
-                            ConcurrencyStamp = "7baa5671-4c1e-4e30-b1ad-8673d87a9e6e",
-                            Name = "Customer",
-                            NormalizedName = "CUSTOMER"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
