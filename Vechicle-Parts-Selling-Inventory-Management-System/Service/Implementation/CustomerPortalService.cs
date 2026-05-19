@@ -30,6 +30,43 @@ public class CustomerPortalService : ICustomerPortalService
         return true;
     }
 
+    public async Task<VehicleDto> AddVehicleAsync(int customerId, CreateVehicleDto dto)
+    {
+        var vehicle = new Vehicle
+        {
+            CustomerId = customerId,
+            RegistrationNumber = dto.RegistrationNumber,
+            Make = dto.Make,
+            Model = dto.Model,
+            Year = dto.Year,
+            VIN = dto.VIN
+        };
+
+        _db.Vehicles.Add(vehicle);
+        await _db.SaveChangesAsync();
+
+        return new VehicleDto
+        {
+            Id = vehicle.Id,
+            RegistrationNumber = vehicle.RegistrationNumber,
+            Make = vehicle.Make,
+            Model = vehicle.Model,
+            Year = vehicle.Year,
+            VIN = vehicle.VIN
+        };
+    }
+
+    public async Task<bool> DeleteVehicleAsync(int customerId, int vehicleId)
+    {
+        var vehicle = await _db.Vehicles
+            .FirstOrDefaultAsync(v => v.Id == vehicleId && v.CustomerId == customerId);
+        if (vehicle == null) return false;
+
+        _db.Vehicles.Remove(vehicle);
+        await _db.SaveChangesAsync();
+        return true;
+    }
+
     public async Task<bool> UpdateVehicleAsync(int customerId, int vehicleId, UpdateVehicleDto dto)
     {
         var vehicle = await _db.Vehicles
@@ -128,6 +165,37 @@ public class CustomerPortalService : ICustomerPortalService
                 Description = r.Description,
                 Status = r.Status,
                 RequestedAt = r.RequestedAt
+            })
+            .ToListAsync();
+    }
+
+    public async Task<List<VehicleDto>> GetMyVehiclesAsync(int customerId)
+    {
+        return await _db.Vehicles
+            .Where(v => v.CustomerId == customerId)
+            .Select(v => new VehicleDto
+            {
+                Id = v.Id,
+                RegistrationNumber = v.RegistrationNumber,
+                Make = v.Make,
+                Model = v.Model,
+                Year = v.Year,
+                VIN = v.VIN
+            })
+            .ToListAsync();
+    }
+
+    public async Task<List<ReviewResponseDto>> GetMyReviewsAsync(int customerId)
+    {
+        return await _db.Reviews
+            .Where(r => r.CustomerId == customerId)
+            .OrderByDescending(r => r.CreatedAt)
+            .Select(r => new ReviewResponseDto
+            {
+                Id = r.Id,
+                Rating = r.Rating,
+                Comment = r.Comment,
+                CreatedAt = r.CreatedAt
             })
             .ToListAsync();
     }

@@ -60,6 +60,9 @@ public class SaleService : ISaleService
                     lowStockParts.Add(part);
             }
 
+            if (totalAmount > 5000)
+                totalAmount *= 0.90m;
+
             var sale = new Sale
             {
                 CustomerId = dto.CustomerId,

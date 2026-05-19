@@ -66,6 +66,40 @@ public class EmailService : IEmailService
             body: body);
     }
 
+    public async Task SendLowStockAlertBatchAsync(List<VehiclePart> parts)
+    {
+        var adminEmail = _configuration["Smtp:AdminEmail"];
+        if (string.IsNullOrWhiteSpace(adminEmail)) return;
+
+        var rows = string.Join("", parts.Select(p => $@"
+            <tr>
+                <td style=""padding:6px 12px;"">{p.Id}</td>
+                <td style=""padding:6px 12px;"">{p.Name}</td>
+                <td style=""padding:6px 12px;"">{p.Category ?? "N/A"}</td>
+                <td style=""padding:6px 12px;""><strong style=""color:red;"">{p.StockQuantity}</strong></td>
+            </tr>"));
+
+        var body = $@"
+<html>
+<body>
+    <h2 style=""color:red;"">⚠ Low Stock Alert — {parts.Count} Part(s) Low on Stock</h2>
+    <p>The following parts have dropped below the minimum stock threshold (10 units):</p>
+    <table style=""border-collapse:collapse;border:1px solid #ddd;"">
+        <tr style=""background:#f2f2f2;"">
+            <th style=""text-align:left;padding:6px 12px;"">ID</th>
+            <th style=""text-align:left;padding:6px 12px;"">Name</th>
+            <th style=""text-align:left;padding:6px 12px;"">Category</th>
+            <th style=""text-align:left;padding:6px 12px;"">Stock</th>
+        </tr>
+        {rows}
+    </table>
+    <p>Please reorder these parts from vendors as soon as possible.</p>
+</body>
+</html>";
+
+        await SendEmailAsync(adminEmail, $"Low Stock Alert: {parts.Count} part(s) below minimum threshold", body);
+    }
+
     public async Task SendCreditReminderAsync(Sale sale, int daysOverdue)
     {
         if (sale.Customer == null)

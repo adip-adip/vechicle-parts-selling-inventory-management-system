@@ -142,6 +142,19 @@ public class AuthService : IAuthService
                 return (false, roleErrors, null);
             }
 
+            var customer = new Customer
+            {
+                FirstName = dto.FirstName,
+                LastName = dto.LastName,
+                Email = dto.Email,
+                Phone = dto.Phone,
+                Address = dto.Address,
+                UserId = user.Id
+            };
+
+            _dbContext.Customers.Add(customer);
+            await _dbContext.SaveChangesAsync();
+
             await transaction.CommitAsync();
             return (true, "Customer registered successfully", user.Id);
         }

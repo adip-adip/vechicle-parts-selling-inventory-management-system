@@ -71,6 +71,9 @@ builder.Services.AddScoped<IPurchaseInvoiceService, PurchaseInvoiceService>();
 // Feature: Overdue Credit Reminders — daily background job (23050302)
 builder.Services.AddHostedService<CreditReminderBackgroundService>();
 
+// Feature: Low Stock Alerts — daily background job
+builder.Services.AddHostedService<LowStockBackgroundService>();
+
 builder.Services.AddIdentity<Users, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
@@ -106,7 +109,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseAuthentication();
 app.UseMiddleware<RequestMiddleware>();

@@ -39,6 +39,15 @@ public class CustomerController : ControllerBase
         return result ? Ok("Profile updated successfully.") : NotFound("Customer not found.");
     }
 
+    [HttpPost("vehicles")]
+    public async Task<IActionResult> AddVehicle([FromBody] CreateVehicleDto dto)
+    {
+        var customerId = await GetCustomerIdAsync();
+        if (customerId == null) return Unauthorized("Customer profile not found.");
+        var result = await _service.AddVehicleAsync(customerId.Value, dto);
+        return Ok(result);
+    }
+
     [HttpPut("vehicles/{vehicleId:int}")]
     public async Task<IActionResult> UpdateVehicle(int vehicleId, [FromBody] UpdateVehicleDto dto)
     {
@@ -92,6 +101,33 @@ public class CustomerController : ControllerBase
         var customerId = await GetCustomerIdAsync();
         if (customerId == null) return Unauthorized("Customer profile not found.");
         var result = await _service.SubmitReviewAsync(customerId.Value, dto);
+        return Ok(result);
+    }
+
+    [HttpDelete("vehicles/{vehicleId:int}")]
+    public async Task<IActionResult> DeleteVehicle(int vehicleId)
+    {
+        var customerId = await GetCustomerIdAsync();
+        if (customerId == null) return Unauthorized("Customer profile not found.");
+        var result = await _service.DeleteVehicleAsync(customerId.Value, vehicleId);
+        return result ? Ok("Vehicle deleted successfully.") : NotFound("Vehicle not found.");
+    }
+
+    [HttpGet("vehicles")]
+    public async Task<IActionResult> GetMyVehicles()
+    {
+        var customerId = await GetCustomerIdAsync();
+        if (customerId == null) return Unauthorized("Customer profile not found.");
+        var result = await _service.GetMyVehiclesAsync(customerId.Value);
+        return Ok(result);
+    }
+
+    [HttpGet("reviews")]
+    public async Task<IActionResult> GetMyReviews()
+    {
+        var customerId = await GetCustomerIdAsync();
+        if (customerId == null) return Unauthorized("Customer profile not found.");
+        var result = await _service.GetMyReviewsAsync(customerId.Value);
         return Ok(result);
     }
 
