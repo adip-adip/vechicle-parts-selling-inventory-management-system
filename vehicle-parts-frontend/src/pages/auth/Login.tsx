@@ -25,9 +25,8 @@ export default function Login() {
   const onSubmit = async (data: FormData) => {
     setLoading(true)
     try {
-      await login(data)
-      const user = JSON.parse(localStorage.getItem('user') || '{}')
-      const role = user.role?.toLowerCase()
+      const res = await login(data)
+      const role = res.role?.toLowerCase()
       if (role === 'admin') navigate('/admin')
       else if (role === 'staff') navigate('/staff')
       else navigate('/customer')

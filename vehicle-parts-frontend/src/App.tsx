@@ -5,6 +5,7 @@ import { AuthProvider } from './contexts/AuthContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import AppLayout from './components/layout/AppLayout'
 
+import { useAuth } from './contexts/AuthContext'
 import Login from './pages/auth/Login'
 import Register from './pages/auth/Register'
 
@@ -31,15 +32,12 @@ import CustomerReviews from './pages/customer/Reviews'
 const queryClient = new QueryClient()
 
 function RootRedirect() {
-  const raw = localStorage.getItem('user')
-  if (!raw) return <Navigate to="/login" replace />
-  try {
-    const user = JSON.parse(raw)
-    const role = user.role?.toLowerCase()
-    if (role === 'admin') return <Navigate to="/admin" replace />
-    if (role === 'staff') return <Navigate to="/staff" replace />
-    if (role === 'customer') return <Navigate to="/customer" replace />
-  } catch {}
+  const { user, isAuthenticated } = useAuth()
+  if (!isAuthenticated) return <Navigate to="/login" replace />
+  const role = user?.role?.toLowerCase()
+  if (role === 'admin') return <Navigate to="/admin" replace />
+  if (role === 'staff') return <Navigate to="/staff" replace />
+  if (role === 'customer') return <Navigate to="/customer" replace />
   return <Navigate to="/login" replace />
 }
 

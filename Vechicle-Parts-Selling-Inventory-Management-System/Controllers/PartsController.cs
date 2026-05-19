@@ -7,7 +7,7 @@ namespace Vechicle_Parts_Selling_Inventory_Management_System.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = "Admin")]
+[Authorize(Roles = "Admin,Staff")]
 public class PartsController : ControllerBase
 {
     private readonly IPartService _partService;

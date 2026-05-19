@@ -31,36 +31,5 @@ public class AppDbContext : IdentityDbContext<Users>
 
         builder.Entity<Users>().ToTable("Users");
         builder.Entity<IdentityRole>().ToTable("Roles");
-
-        SeedRoles(builder);
-    }
-
-    private static void SeedRoles(ModelBuilder builder)
-    {
-        var roles = new List<IdentityRole>
-        {
-            new()
-            {
-                Id = Guid.NewGuid().ToString(),
-                Name = "Admin",
-                NormalizedName = "ADMIN",
-                ConcurrencyStamp = Guid.NewGuid().ToString()
-            },
-            new()
-            {
-                Id = Guid.NewGuid().ToString(),
-                Name = "Staff",
-                NormalizedName = "STAFF",
-                ConcurrencyStamp = Guid.NewGuid().ToString()
-            },
-            new()
-            {
-                Id = Guid.NewGuid().ToString(),
-                Name = "Customer",
-                NormalizedName = "CUSTOMER",
-                ConcurrencyStamp = Guid.NewGuid().ToString()
-            }
-        };
-        builder.Entity<IdentityRole>().HasData(roles);
     }
 }

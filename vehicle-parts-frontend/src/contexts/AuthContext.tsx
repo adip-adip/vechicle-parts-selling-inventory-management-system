@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react'
-import type { LoginDto } from '../types/api'
+import type { LoginDto, LoginResponse } from '../types/api'
 import { authApi } from '../api/auth'
 
 interface User {
@@ -13,7 +13,7 @@ interface User {
 interface AuthContextType {
   user: User | null
   token: string | null
-  login: (data: LoginDto) => Promise<void>
+  login: (data: LoginDto) => Promise<LoginResponse>
   logout: () => void
   isAuthenticated: boolean
   hasRole: (...roles: string[]) => boolean
@@ -56,6 +56,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       lastName: res.lastName!,
       role: res.role!,
     })
+    return res
   }
 
   const logout = () => {

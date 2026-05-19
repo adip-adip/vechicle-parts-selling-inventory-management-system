@@ -14,7 +14,7 @@ export default function Customers() {
   const [searchVehicle, setSearchVehicle] = useState('')
   const [searchId, setSearchId] = useState('')
 
-  const hasAnySearch = searchTerm || searchPhone || searchVehicle || searchId
+  const hasAnySearch = Boolean(searchTerm || searchPhone || searchVehicle || searchId)
 
   const { data: searchResults, isLoading: searchLoading } = useQuery({
     queryKey: ['customer-search', searchTerm, searchPhone, searchVehicle, searchId],
