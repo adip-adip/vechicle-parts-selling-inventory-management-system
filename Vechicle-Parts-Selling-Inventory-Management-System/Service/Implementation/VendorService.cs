@@ -1,3 +1,4 @@
+// Author: Ronak Raj Rauniyar (23050302) - Vendor Management, Purchase Invoices, Low Stock Alerts, Overdue Credit Reminders
 using Microsoft.EntityFrameworkCore;
 using Vechicle_Parts_Selling_Inventory_Management_System.Database;
 using Vechicle_Parts_Selling_Inventory_Management_System.Database.Entities;
