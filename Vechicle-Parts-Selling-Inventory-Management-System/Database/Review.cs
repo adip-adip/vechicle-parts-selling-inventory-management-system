@@ -10,6 +10,10 @@ public class Review
     public int CustomerId { get; set; }
     public Customer Customer { get; set; } = null!;
 
+    public int? AppointmentId { get; set; }
+    public Appointment? Appointment { get; set; }
+
+    [Required]
     [Range(1, 5)]
     public int Rating { get; set; }
 

@@ -30,6 +30,26 @@ public class CustomerPortalService : ICustomerPortalService
         return true;
     }
 
+    public async Task<CustomerProfileDto?> GetMyProfileAsync(int customerId)
+    {
+        var customer = await _db.Customers
+            .Include(c => c.Sales)
+            .FirstOrDefaultAsync(c => c.Id == customerId);
+        if (customer == null) return null;
+
+        return new CustomerProfileDto
+        {
+            Id = customer.Id,
+            FirstName = customer.FirstName,
+            LastName = customer.LastName,
+            Email = customer.Email,
+            Phone = customer.Phone,
+            Address = customer.Address,
+            TotalSales = customer.Sales.Count,
+            TotalSpent = customer.Sales.Sum(s => s.TotalAmount),
+        };
+    }
+
     public async Task<VehicleDto> AddVehicleAsync(int customerId, CreateVehicleDto dto)
     {
         var vehicle = new Vehicle
@@ -188,6 +208,7 @@ public class CustomerPortalService : ICustomerPortalService
     public async Task<List<ReviewResponseDto>> GetMyReviewsAsync(int customerId)
     {
         return await _db.Reviews
+            .Include(r => r.Appointment)
             .Where(r => r.CustomerId == customerId)
             .OrderByDescending(r => r.CreatedAt)
             .Select(r => new ReviewResponseDto
@@ -195,16 +216,35 @@ public class CustomerPortalService : ICustomerPortalService
                 Id = r.Id,
                 Rating = r.Rating,
                 Comment = r.Comment,
-                CreatedAt = r.CreatedAt
+                CreatedAt = r.CreatedAt,
+                AppointmentId = r.AppointmentId,
+                ServiceType = r.Appointment != null ? r.Appointment.ServiceType : null
             })
             .ToListAsync();
     }
 
     public async Task<ReviewResponseDto> SubmitReviewAsync(int customerId, CreateReviewDto dto)
     {
+        string? serviceType = null;
+
+        if (dto.AppointmentId.HasValue)
+        {
+            var appointment = await _db.Appointments
+                .FirstOrDefaultAsync(a => a.Id == dto.AppointmentId && a.CustomerId == customerId);
+
+            if (appointment == null)
+                throw new InvalidOperationException("Appointment not found or does not belong to you.");
+
+            if (appointment.Status != "Completed")
+                throw new InvalidOperationException("You can only review completed appointments.");
+
+            serviceType = appointment.ServiceType;
+        }
+
         var review = new Review
         {
             CustomerId = customerId,
+            AppointmentId = dto.AppointmentId,
             Rating = dto.Rating,
             Comment = dto.Comment
         };
@@ -217,7 +257,9 @@ public class CustomerPortalService : ICustomerPortalService
             Id = review.Id,
             Rating = review.Rating,
             Comment = review.Comment,
-            CreatedAt = review.CreatedAt
+            CreatedAt = review.CreatedAt,
+            AppointmentId = review.AppointmentId,
+            ServiceType = serviceType
         };
     }
 

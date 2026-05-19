@@ -5,7 +5,8 @@ import DataTable from '../../components/ui/DataTable'
 import toast from 'react-hot-toast'
 import { useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
-import { Plus, Eye, Search } from 'lucide-react'
+import { Plus, Eye, Search, Trash2 } from 'lucide-react'
+import type { VehicleEntry } from '../../types/api'
 
 export default function Customers() {
   const [showForm, setShowForm] = useState(false)
@@ -13,8 +14,7 @@ export default function Customers() {
   const [searchPhone, setSearchPhone] = useState('')
   const [searchVehicle, setSearchVehicle] = useState('')
   const [searchId, setSearchId] = useState('')
-
-  const hasAnySearch = Boolean(searchTerm || searchPhone || searchVehicle || searchId)
+  const [vehicles, setVehicles] = useState<VehicleEntry[]>([{ registrationNumber: '', make: '', model: '', year: new Date().getFullYear(), vin: '' }])
 
   const { data: searchResults, isLoading: searchLoading } = useQuery({
     queryKey: ['customer-search', searchTerm, searchPhone, searchVehicle, searchId],
@@ -24,22 +24,35 @@ export default function Customers() {
       vehicleNo: searchVehicle || undefined,
       customerId: searchId ? Number(searchId) : undefined,
     }),
-    enabled: hasAnySearch,
   })
 
   const { register, handleSubmit, reset } = useForm()
 
   const createMutation = useMutation({
-    mutationFn: (data: any) => staffApi.createCustomerWithVehicle({ ...data, year: Number(data.year) }),
+    mutationFn: (data: any) => staffApi.createCustomerWithVehicle({
+      firstName: data.firstName,
+      lastName: data.lastName,
+      email: data.email,
+      phone: data.phone,
+      address: data.address,
+      vehicles: vehicles.map(v => ({ ...v, year: Number(v.year) })),
+    }),
     onSuccess: () => {
-      toast.success('Customer created with vehicle')
+      toast.success('Customer created with vehicles')
       setShowForm(false)
       reset()
+      setVehicles([{ registrationNumber: '', make: '', model: '', year: new Date().getFullYear(), vin: '' }])
     },
     onError: (err: any) => toast.error(err?.response?.data?.message || 'Failed to create'),
   })
 
   const onSubmit = (data: any) => createMutation.mutate(data)
+
+  const addVehicle = () => setVehicles(prev => [...prev, { registrationNumber: '', make: '', model: '', year: new Date().getFullYear(), vin: '' }])
+  const removeVehicle = (index: number) => setVehicles(prev => prev.filter((_, i) => i !== index))
+  const updateVehicle = (index: number, field: keyof VehicleEntry, value: string) => {
+    setVehicles(prev => prev.map((v, i) => i === index ? { ...v, [field]: value } : v))
+  }
 
   return (
     <div>
@@ -76,28 +89,40 @@ export default function Customers() {
             </div>
 
             <div className="border-t pt-4 md:col-span-3">
-              <h3 className="font-medium text-slate-700 mb-2">Vehicle Details</h3>
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-medium text-slate-700">Vehicle Details</h3>
+                <button type="button" onClick={addVehicle} className="text-xs text-blue-600 hover:text-blue-800 font-medium">+ Add Another Vehicle</button>
+              </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Registration #</label>
-              <input {...register('registrationNumber')} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Make</label>
-              <input {...register('make')} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Model</label>
-              <input {...register('model')} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Year</label>
-              <input type="number" {...register('year')} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">VIN</label>
-              <input {...register('vin')} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" />
-            </div>
+            {vehicles.map((v, i) => (
+              <div key={i} className="md:col-span-3 border border-slate-200 rounded-lg p-4 grid grid-cols-1 md:grid-cols-5 gap-3 relative">
+                {vehicles.length > 1 && (
+                  <button type="button" onClick={() => removeVehicle(i)} className="absolute top-2 right-2 text-red-500 hover:text-red-700">
+                    <Trash2 size={16} />
+                  </button>
+                )}
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Registration #</label>
+                  <input value={v.registrationNumber} onChange={e => updateVehicle(i, 'registrationNumber', e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Make</label>
+                  <input value={v.make} onChange={e => updateVehicle(i, 'make', e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Model</label>
+                  <input value={v.model} onChange={e => updateVehicle(i, 'model', e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Year</label>
+                  <input type="number" value={v.year} onChange={e => updateVehicle(i, 'year', e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">VIN</label>
+                  <input value={v.vin ?? ''} onChange={e => updateVehicle(i, 'vin', e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" />
+                </div>
+              </div>
+            ))}
 
             <div className="flex gap-2 md:col-span-3">
               <button type="submit" className="bg-blue-600 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-blue-700">Create</button>

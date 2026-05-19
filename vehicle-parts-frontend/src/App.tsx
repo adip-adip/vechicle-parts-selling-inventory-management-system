@@ -21,6 +21,9 @@ import StaffCustomers from './pages/staff/Customers'
 import StaffCustomerDetail from './pages/staff/CustomerDetail'
 import StaffSales from './pages/staff/Sales'
 import StaffCreateSale from './pages/staff/CreateSale'
+import StaffPartRequests from './pages/staff/PartRequests'
+import StaffAppointments from './pages/staff/Appointments'
+import StaffReports from './pages/staff/Reports'
 
 import CustomerDashboard from './pages/customer/Dashboard'
 import CustomerProfile from './pages/customer/Profile'
@@ -28,6 +31,7 @@ import CustomerVehicles from './pages/customer/Vehicles'
 import CustomerAppointments from './pages/customer/Appointments'
 import CustomerPartRequests from './pages/customer/PartRequests'
 import CustomerReviews from './pages/customer/Reviews'
+import CustomerHistory from './pages/customer/History'
 
 const queryClient = new QueryClient()
 
@@ -71,6 +75,9 @@ export default function App() {
                 <Route path="/staff/customers/:id" element={<StaffCustomerDetail />} />
                 <Route path="/staff/sales" element={<StaffSales />} />
                 <Route path="/staff/sales/new" element={<StaffCreateSale />} />
+                <Route path="/staff/part-requests" element={<StaffPartRequests />} />
+                <Route path="/staff/appointments" element={<StaffAppointments />} />
+                <Route path="/staff/reports" element={<StaffReports />} />
               </Route>
             </Route>
 
@@ -80,6 +87,7 @@ export default function App() {
                 <Route path="/customer" element={<CustomerDashboard />} />
                 <Route path="/customer/profile" element={<CustomerProfile />} />
                 <Route path="/customer/vehicles" element={<CustomerVehicles />} />
+                <Route path="/customer/history" element={<CustomerHistory />} />
                 <Route path="/customer/appointments" element={<CustomerAppointments />} />
                 <Route path="/customer/part-requests" element={<CustomerPartRequests />} />
                 <Route path="/customer/reviews" element={<CustomerReviews />} />

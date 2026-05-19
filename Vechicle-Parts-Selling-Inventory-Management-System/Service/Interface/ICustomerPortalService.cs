@@ -16,6 +16,7 @@ public interface ICustomerPortalService
     Task<ReviewResponseDto> SubmitReviewAsync(int customerId, CreateReviewDto dto);
     Task<List<ReviewResponseDto>> GetMyReviewsAsync(int customerId);
     Task<List<VehicleDto>> GetMyVehiclesAsync(int customerId);
+    Task<CustomerProfileDto?> GetMyProfileAsync(int customerId);
     Task<CustomerHistoryDto?> GetMyHistoryAsync(int customerId);
     Task<decimal> ApplyLoyaltyDiscountAsync(decimal totalAmount);
 }

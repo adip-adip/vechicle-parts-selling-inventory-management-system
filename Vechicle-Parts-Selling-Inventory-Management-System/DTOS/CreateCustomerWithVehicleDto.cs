@@ -25,6 +25,13 @@ public class CreateCustomerWithVehicleDto
     public string? Address { get; set; }
 
     [Required]
+    [MinLength(1)]
+    public List<VehicleEntry> Vehicles { get; set; } = new();
+}
+
+public class VehicleEntry
+{
+    [Required]
     [StringLength(20)]
     public string RegistrationNumber { get; set; } = null!;
 

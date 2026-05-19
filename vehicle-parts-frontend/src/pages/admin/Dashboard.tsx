@@ -48,7 +48,7 @@ export default function AdminDashboard() {
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-slate-600">Total Inventory Value</span>
-              <span className="font-semibold">${totalValue.toLocaleString()}</span>
+              <span className="font-semibold">Rs.{totalValue.toLocaleString('en-IN')}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-slate-600">Categories</span>

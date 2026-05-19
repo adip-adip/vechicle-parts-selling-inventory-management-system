@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { customerPortalApi } from '../../api/customerPortal'
 import DataTable from '../../components/ui/DataTable'
 import toast from 'react-hot-toast'
-import { Car, Plus, Pencil, Trash2 } from 'lucide-react'
+import { Car, Plus } from 'lucide-react'
 import type { VehicleDto, CreateVehicleDto } from '../../types/api'
 
 export default function Vehicles() {

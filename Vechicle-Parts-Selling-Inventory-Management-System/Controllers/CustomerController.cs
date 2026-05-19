@@ -30,6 +30,15 @@ public class CustomerController : ControllerBase
         return customer?.Id;
     }
 
+    [HttpGet("profile")]
+    public async Task<IActionResult> GetProfile()
+    {
+        var customerId = await GetCustomerIdAsync();
+        if (customerId == null) return Unauthorized("Customer profile not found.");
+        var profile = await _service.GetMyProfileAsync(customerId.Value);
+        return profile == null ? NotFound() : Ok(profile);
+    }
+
     [HttpPut("profile")]
     public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileDto dto)
     {
@@ -138,6 +147,23 @@ public class CustomerController : ControllerBase
         if (customerId == null) return Unauthorized("Customer profile not found.");
         var result = await _service.GetMyHistoryAsync(customerId.Value);
         return result == null ? NotFound() : Ok(result);
+    }
+
+    [HttpGet("available-parts")]
+    public async Task<IActionResult> GetAvailableParts()
+    {
+        var parts = await _db.VehicleParts
+            .OrderBy(p => p.Name)
+            .Select(p => new
+            {
+                p.Id,
+                p.Name,
+                p.Category,
+                p.Price,
+                p.StockQuantity
+            })
+            .ToListAsync();
+        return Ok(parts);
     }
 
     [HttpGet("loyalty-check")]

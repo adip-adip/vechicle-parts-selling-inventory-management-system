@@ -48,26 +48,31 @@ public class StaffController : ControllerBase
             _dbContext.Customers.Add(customer);
             await _dbContext.SaveChangesAsync();
 
-            var vehicle = new Vehicle
-            {
-                CustomerId = customer.Id,
-                RegistrationNumber = dto.RegistrationNumber,
-                Make = dto.Make,
-                Model = dto.Model,
-                Year = dto.Year,
-                VIN = dto.VIN
-            };
+            var vehicleIds = new List<int>();
 
-            _dbContext.Vehicles.Add(vehicle);
-            await _dbContext.SaveChangesAsync();
+            foreach (var v in dto.Vehicles)
+            {
+                var vehicle = new Vehicle
+                {
+                    CustomerId = customer.Id,
+                    RegistrationNumber = v.RegistrationNumber,
+                    Make = v.Make,
+                    Model = v.Model,
+                    Year = v.Year,
+                    VIN = v.VIN
+                };
+                _dbContext.Vehicles.Add(vehicle);
+                await _dbContext.SaveChangesAsync();
+                vehicleIds.Add(vehicle.Id);
+            }
 
             await transaction.CommitAsync();
 
             return Ok(new
             {
-                message = "Customer registered with vehicle successfully.",
+                message = "Customer registered with vehicles successfully.",
                 customerId = customer.Id,
-                vehicleId = vehicle.Id
+                vehicleIds
             });
         }
         catch
@@ -197,5 +202,127 @@ public class StaffController : ControllerBase
     {
         var results = await _customerService.SearchCustomersAsync(term, customerId, phone, vehicleNo);
         return Ok(results);
+    }
+
+    [HttpGet("part-requests")]
+    public async Task<IActionResult> GetAllPartRequests()
+    {
+        var requests = await _dbContext.PartRequests
+            .Include(p => p.Customer)
+            .OrderByDescending(p => p.RequestedAt)
+            .Select(p => new StaffPartRequestResponseDto
+            {
+                Id = p.Id,
+                CustomerId = p.CustomerId,
+                CustomerName = p.Customer.FirstName + " " + p.Customer.LastName,
+                CustomerEmail = p.Customer.Email,
+                PartName = p.PartName,
+                Description = p.Description,
+                Status = p.Status,
+                RequestedAt = p.RequestedAt
+            })
+            .ToListAsync();
+        return Ok(requests);
+    }
+
+    [HttpGet("customers/{id:int}/part-requests")]
+    public async Task<IActionResult> GetCustomerPartRequests(int id)
+    {
+        var exists = await _dbContext.Customers.AnyAsync(c => c.Id == id);
+        if (!exists) return NotFound("Customer not found.");
+
+        var requests = await _dbContext.PartRequests
+            .Include(p => p.Customer)
+            .Where(p => p.CustomerId == id)
+            .OrderByDescending(p => p.RequestedAt)
+            .Select(p => new StaffPartRequestResponseDto
+            {
+                Id = p.Id,
+                CustomerId = p.CustomerId,
+                CustomerName = p.Customer.FirstName + " " + p.Customer.LastName,
+                CustomerEmail = p.Customer.Email,
+                PartName = p.PartName,
+                Description = p.Description,
+                Status = p.Status,
+                RequestedAt = p.RequestedAt
+            })
+            .ToListAsync();
+        return Ok(requests);
+    }
+
+    [HttpPatch("part-requests/{id:int}/status")]
+    public async Task<IActionResult> UpdatePartRequestStatus(int id, [FromBody] UpdatePartRequestStatusDto dto)
+    {
+        if (!ModelState.IsValid) return BadRequest(ModelState);
+
+        var request = await _dbContext.PartRequests.FindAsync(id);
+        if (request == null) return NotFound("Part request not found.");
+
+        request.Status = dto.Status;
+        await _dbContext.SaveChangesAsync();
+
+        return Ok(new { message = $"Part request status updated to {dto.Status}." });
+    }
+
+    [HttpGet("appointments")]
+    public async Task<IActionResult> GetAllAppointments()
+    {
+        var appointments = await _dbContext.Appointments
+            .Include(a => a.Customer)
+            .Include(a => a.Vehicle)
+            .OrderByDescending(a => a.AppointmentDate)
+            .Select(a => new
+            {
+                a.Id,
+                a.ServiceType,
+                a.AppointmentDate,
+                a.Status,
+                a.Notes,
+                CustomerId = a.Customer.Id,
+                CustomerName = a.Customer.FirstName + " " + a.Customer.LastName,
+                CustomerEmail = a.Customer.Email,
+                VehicleRegistration = a.Vehicle != null ? a.Vehicle.RegistrationNumber : null,
+                a.CreatedAt
+            })
+            .ToListAsync();
+        return Ok(appointments);
+    }
+
+    [HttpGet("customers/{id:int}/appointments")]
+    public async Task<IActionResult> GetCustomerAppointments(int id)
+    {
+        var exists = await _dbContext.Customers.AnyAsync(c => c.Id == id);
+        if (!exists) return NotFound("Customer not found.");
+
+        var appointments = await _dbContext.Appointments
+            .Include(a => a.Vehicle)
+            .Where(a => a.CustomerId == id)
+            .OrderByDescending(a => a.AppointmentDate)
+            .Select(a => new
+            {
+                a.Id,
+                a.ServiceType,
+                a.AppointmentDate,
+                a.Status,
+                a.Notes,
+                VehicleRegistration = a.Vehicle != null ? a.Vehicle.RegistrationNumber : null,
+                a.CreatedAt
+            })
+            .ToListAsync();
+        return Ok(appointments);
+    }
+
+    [HttpPatch("appointments/{id:int}/status")]
+    public async Task<IActionResult> UpdateAppointmentStatus(int id, [FromBody] UpdateAppointmentStatusDto dto)
+    {
+        if (!ModelState.IsValid) return BadRequest(ModelState);
+
+        var appointment = await _dbContext.Appointments.FindAsync(id);
+        if (appointment == null) return NotFound("Appointment not found.");
+
+        appointment.Status = dto.Status;
+        await _dbContext.SaveChangesAsync();
+
+        return Ok(new { message = $"Appointment status updated to {dto.Status}." });
     }
 }

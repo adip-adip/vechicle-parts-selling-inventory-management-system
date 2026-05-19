@@ -1,5 +1,5 @@
 export function formatCurrency(n: number): string {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(n)
+  return 'Rs.' + n.toLocaleString('en-IN', { maximumFractionDigits: 0 })
 }
 
 export function formatDate(d: string): string {

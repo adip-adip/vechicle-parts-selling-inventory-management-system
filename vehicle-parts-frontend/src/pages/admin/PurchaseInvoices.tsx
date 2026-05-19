@@ -6,7 +6,7 @@ import { partsApi } from '../../api/parts'
 import DataTable from '../../components/ui/DataTable'
 import toast from 'react-hot-toast'
 import { formatCurrency, formatDate } from '../../utils/format'
-import { Plus, X } from 'lucide-react'
+import { Plus, X, ToggleLeft, ToggleRight, Trash2 } from 'lucide-react'
 
 export default function PurchaseInvoices() {
   const queryClient = useQueryClient()
@@ -118,7 +118,7 @@ export default function PurchaseInvoices() {
                 <label className="block text-xs text-slate-500 mb-1">Part</label>
                 <select value={item.vehiclePartId} onChange={e => updateItem(idx, 'vehiclePartId', Number(e.target.value))} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm">
                   <option value="0">Select part</option>
-                  {parts?.map(p => <option key={p.id} value={p.id}>{p.name} (${p.price})</option>)}
+                  {parts?.map(p => <option key={p.id} value={p.id}>{p.name} (Rs.{p.price.toLocaleString()})</option>)}
                 </select>
               </div>
               <div className="w-24">
@@ -165,20 +165,22 @@ export default function PurchaseInvoices() {
           )},
         ]}
         actions={inv => (
-          <>
+          <div className="flex items-center gap-3">
             <button
               onClick={() => statusMutation.mutate({ id: inv.id, status: inv.status === 'Paid' ? 'Unpaid' : 'Paid' })}
-              className="text-xs font-medium text-green-600 hover:text-green-800"
+              className="text-green-600 hover:text-green-800"
+              title="Toggle Status"
             >
-              Toggle Status
+              {inv.status === 'Paid' ? <ToggleRight size={18} /> : <ToggleLeft size={18} />}
             </button>
             <button
               onClick={() => { if (confirm('Delete this invoice?')) deleteMutation.mutate(inv.id) }}
-              className="text-xs font-medium text-red-600 hover:text-red-800"
+              className="text-red-600 hover:text-red-800"
+              title="Delete"
             >
-              Delete
+              <Trash2 size={18} />
             </button>
-          </>
+          </div>
         )}
       />
     </div>

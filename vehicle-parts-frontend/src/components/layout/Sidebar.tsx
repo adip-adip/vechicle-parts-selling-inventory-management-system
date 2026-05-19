@@ -4,6 +4,7 @@ import {
   LayoutDashboard, Package, Users, Truck,
   FileText, BarChart3, Store, UserCircle,
   Calendar, MessageSquare, ClipboardList, Car,
+  ClipboardCheck, History,
 } from 'lucide-react'
 
 const navItems: Record<string, { label: string; path: string; icon: React.ReactNode }[]> = {
@@ -19,10 +20,14 @@ const navItems: Record<string, { label: string; path: string; icon: React.ReactN
     { label: 'Dashboard', path: '/staff', icon: <LayoutDashboard size={18} /> },
     { label: 'Customers', path: '/staff/customers', icon: <Users size={18} /> },
     { label: 'Sales', path: '/staff/sales', icon: <Store size={18} /> },
+    { label: 'Appointments', path: '/staff/appointments', icon: <Calendar size={18} /> },
+    { label: 'Part Requests', path: '/staff/part-requests', icon: <ClipboardCheck size={18} /> },
+    { label: 'Reports', path: '/staff/reports', icon: <BarChart3 size={18} /> },
   ],
   Customer: [
     { label: 'Dashboard', path: '/customer', icon: <LayoutDashboard size={18} /> },
     { label: 'Profile', path: '/customer/profile', icon: <UserCircle size={18} /> },
+    { label: 'Purchase History', path: '/customer/history', icon: <History size={18} /> },
     { label: 'Vehicles', path: '/customer/vehicles', icon: <Car size={18} /> },
     { label: 'Appointments', path: '/customer/appointments', icon: <Calendar size={18} /> },
     { label: 'Part Requests', path: '/customer/part-requests', icon: <ClipboardList size={18} /> },

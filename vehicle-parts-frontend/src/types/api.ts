@@ -58,6 +58,7 @@ export interface Vendor {
   email?: string
   address?: string
   paymentTerms?: string
+  purchaseInvoices?: PurchaseInvoice[]
 }
 
 export interface CreateVendorDto {
@@ -162,17 +163,21 @@ export interface VehicleDto {
   vin?: string
 }
 
+export interface VehicleEntry {
+  registrationNumber: string
+  make: string
+  model: string
+  year: number
+  vin?: string
+}
+
 export interface CreateCustomerWithVehicleDto {
   firstName: string
   lastName: string
   email: string
   phone: string
   address?: string
-  registrationNumber: string
-  make: string
-  model: string
-  year: number
-  vin?: string
+  vehicles: VehicleEntry[]
 }
 
 export interface CustomerSearchResultDto {
@@ -184,6 +189,17 @@ export interface CustomerSearchResultDto {
   vehicleCount: number
   saleCount: number
   registrationNumbers: string[]
+}
+
+export interface CustomerProfileDto {
+  id: number
+  firstName: string
+  lastName: string
+  email: string
+  phone: string
+  address?: string
+  totalSales: number
+  totalSpent: number
 }
 
 export interface CustomerHistoryDto {
@@ -325,6 +341,14 @@ export interface AppointmentResponseDto {
   createdAt: string
 }
 
+export interface AvailablePartDto {
+  id: number
+  name: string
+  category?: string
+  price: number
+  stockQuantity: number
+}
+
 export interface CreatePartRequestDto {
   partName: string
   description?: string
@@ -341,6 +365,7 @@ export interface PartRequestResponseDto {
 export interface CreateReviewDto {
   rating: number
   comment?: string
+  appointmentId?: number
 }
 
 export interface ReviewResponseDto {
@@ -348,6 +373,8 @@ export interface ReviewResponseDto {
   rating: number
   comment?: string
   createdAt: string
+  appointmentId?: number
+  serviceType?: string
 }
 
 export interface LoyaltyCheckDto {
@@ -355,4 +382,19 @@ export interface LoyaltyCheckDto {
   discountApplied: number
   discountedAmount: number
   youSave: number
+}
+
+export interface StaffPartRequestDto {
+  id: number
+  customerId: number
+  customerName: string
+  customerEmail: string
+  partName: string
+  description?: string
+  status: string
+  requestedAt: string
+}
+
+export interface UpdatePartRequestStatusDto {
+  status: string
 }

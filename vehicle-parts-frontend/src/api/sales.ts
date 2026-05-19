@@ -1,5 +1,5 @@
 import client from './client'
-import type { Sale, CreateSaleDto, CustomerSearchResultDto } from '../types/api'
+import type { Sale, CreateSaleDto, CustomerSearchResultDto, StaffPartRequestDto, UpdatePartRequestStatusDto, AppointmentResponseDto } from '../types/api'
 
 export const salesApi = {
   getAll: () => client.get<Sale[]>('/staff/sales').then(r => r.data),
@@ -37,4 +37,22 @@ export const staffCustomersApi = {
 export const staffApi = {
   createCustomerWithVehicle: (data: import('../types/api').CreateCustomerWithVehicleDto) =>
     client.post('/staff/customers', data).then(r => r.data),
+
+  getPartRequests: (customerId: number) =>
+    client.get<StaffPartRequestDto[]>(`/staff/customers/${customerId}/part-requests`).then(r => r.data),
+
+  getAllPartRequests: () =>
+    client.get<StaffPartRequestDto[]>('/staff/part-requests').then(r => r.data),
+
+  updatePartRequestStatus: (id: number, data: UpdatePartRequestStatusDto) =>
+    client.patch(`/staff/part-requests/${id}/status`, data).then(r => r.data),
+
+  getAppointments: (customerId: number) =>
+    client.get<AppointmentResponseDto[]>(`/staff/customers/${customerId}/appointments`).then(r => r.data),
+
+  getAllAppointments: () =>
+    client.get<any[]>('/staff/appointments').then(r => r.data),
+
+  updateAppointmentStatus: (id: number, status: string) =>
+    client.patch(`/staff/appointments/${id}/status`, { status }).then(r => r.data),
 }

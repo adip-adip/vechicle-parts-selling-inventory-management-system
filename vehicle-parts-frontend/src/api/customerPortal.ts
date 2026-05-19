@@ -3,10 +3,13 @@ import type {
   UpdateProfileDto, CreateVehicleDto, UpdateVehicleDto, CreateAppointmentDto,
   AppointmentResponseDto, CreatePartRequestDto, PartRequestResponseDto,
   CreateReviewDto, ReviewResponseDto, CustomerHistoryDto, LoyaltyCheckDto,
-  VehicleDto,
+  CustomerProfileDto, VehicleDto, AvailablePartDto,
 } from '../types/api'
 
 export const customerPortalApi = {
+  getProfile: () =>
+    client.get<CustomerProfileDto>('/Customer/profile').then(r => r.data),
+
   updateProfile: (data: UpdateProfileDto) =>
     client.put('/Customer/profile', data).then(r => r.data),
 
@@ -42,6 +45,9 @@ export const customerPortalApi = {
 
   getHistory: () =>
     client.get<CustomerHistoryDto>('/Customer/history').then(r => r.data),
+
+  getAvailableParts: () =>
+    client.get<AvailablePartDto[]>('/Customer/available-parts').then(r => r.data),
 
   checkLoyalty: (amount: number) =>
     client.get<LoyaltyCheckDto>('/Customer/loyalty-check', { params: { amount } }).then(r => r.data),

@@ -6,7 +6,6 @@ import toast from 'react-hot-toast'
 import { useForm } from 'react-hook-form'
 import { formatDate } from '../../utils/format'
 import { Plus, Star } from 'lucide-react'
-import client from '../../api/client'
 
 const averageRating = (reviews: any[]) => {
   if (!reviews.length) return 0
@@ -19,13 +18,26 @@ export default function Reviews() {
 
   const { data: reviews, isLoading } = useQuery({
     queryKey: ['customer-reviews'],
-    queryFn: () => client.get('/Customer/reviews').then(r => r.data),
+    queryFn: customerPortalApi.getReviews,
   })
 
-  const { register, handleSubmit, reset } = useForm()
+  const { data: appointments } = useQuery({
+    queryKey: ['customer-appointments-completed'],
+    queryFn: customerPortalApi.getAppointments,
+  })
+
+  const completedAppointments = Array.isArray(appointments)
+    ? appointments.filter((a: any) => a.status === 'Completed')
+    : []
+
+  const { register, handleSubmit, reset, setValue } = useForm()
 
   const createMutation = useMutation({
-    mutationFn: (data: any) => customerPortalApi.createReview({ rating: Number(data.rating), comment: data.comment }),
+    mutationFn: (data: any) => customerPortalApi.createReview({
+      rating: Number(data.rating),
+      comment: data.comment || undefined,
+      appointmentId: data.appointmentId ? Number(data.appointmentId) : undefined,
+    }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['customer-reviews'] })
       toast.success('Review submitted')
@@ -59,6 +71,20 @@ export default function Reviews() {
         <div className="bg-white rounded-xl shadow-sm p-6 mb-6 max-w-lg">
           <h2 className="text-lg font-semibold text-slate-800 mb-4">Write a Review</h2>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            {completedAppointments.length > 0 && (
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Service (optional)</label>
+                <select {...register('appointmentId')} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  <option value="">General review (no specific service)</option>
+                  {completedAppointments.map((a: any) => (
+                    <option key={a.id} value={a.id}>
+                      {a.serviceType} - {formatDate(a.appointmentDate)}
+                      {a.vehicleRegistration ? ` (${a.vehicleRegistration})` : ''}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Rating (1-5)</label>
               <input type="number" min={1} max={5} {...register('rating')} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
@@ -80,6 +106,7 @@ export default function Reviews() {
         data={Array.isArray(reviews) ? reviews : []}
         keyExtractor={(r: any) => r.id}
         columns={[
+          { header: 'Service', accessor: (r: any) => r.serviceType || 'General', sortable: true },
           { header: 'Rating', accessor: (r: any) => (
             <span className="flex items-center gap-1">
               <Star size={14} className="text-yellow-500 fill-yellow-500" />
